@@ -8,3 +8,5 @@ cmake_install.cmake
 __pycache__/
 *.pyc
 .vscode/
+encoded.png
+output.png
