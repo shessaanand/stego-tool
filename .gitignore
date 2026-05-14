@@ -1,0 +1,10 @@
+build/
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+
+.venv/
+__pycache__/
+*.pyc
+.vscode/
