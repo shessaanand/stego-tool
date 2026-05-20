@@ -13,3 +13,6 @@ output.png
 encoded.png
 output.png
 *.so
+build/
+*.png
+*.txt
