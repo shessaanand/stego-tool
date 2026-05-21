@@ -93,3 +93,4 @@ class HomePage(QWidget):
         )
 
         self.setLayout(layout)
+        
