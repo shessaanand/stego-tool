@@ -1,4 +1,5 @@
 import subprocess
+import os
 
 from PyQt6.QtWidgets import (
     QWidget,
@@ -18,26 +19,58 @@ class DecodePage(QWidget):
         self.image_path = ""
 
         layout = QVBoxLayout()
-        layout.setSpacing(15)
+
+        layout.setContentsMargins(
+            40,
+            40,
+            40,
+            40
+        )
+
+        layout.setSpacing(20)
 
         back_button = QPushButton("← Back")
+        back_button.setFixedHeight(42)
+
         back_button.clicked.connect(
             self.main_window.show_home
         )
 
-        self.image_label = QLabel("No image selected")
+        self.image_label = QLabel(
+            "No image selected"
+        )
 
-        select_button = QPushButton("Choose Image")
-        select_button.clicked.connect(self.select_image)
+        select_button = QPushButton(
+            "Choose Image"
+        )
 
-        decode_button = QPushButton("Decode")
-        decode_button.clicked.connect(self.decode_message)
+        select_button.setFixedHeight(42)
+
+        select_button.clicked.connect(
+            self.select_image
+        )
+
+        decode_button = QPushButton(
+            "Decode"
+        )
+
+        decode_button.setFixedHeight(42)
+
+        decode_button.clicked.connect(
+            self.decode_message
+        )
 
         self.output_box = QTextEdit()
+
         self.output_box.setReadOnly(True)
 
-        self.status_label = QLabel("Status: Ready")
+        self.output_box.setPlaceholderText(
+            "Decoded message appears here"
+        )
 
+        self.status_label = QLabel(
+            "Status: Ready"
+        )
 
         layout.addWidget(back_button)
         layout.addWidget(select_button)
@@ -58,13 +91,21 @@ class DecodePage(QWidget):
 
         if file_path:
             self.image_path = file_path
-            self.image_label.setText(file_path)
+
+            filename = os.path.basename(
+                file_path
+            )
+
+            self.image_label.setText(
+                filename
+            )
 
     def decode_message(self):
         if not self.image_path:
             self.status_label.setText(
                 "Status: Select an image"
             )
+
             return
 
         result = subprocess.run(
@@ -78,11 +119,26 @@ class DecodePage(QWidget):
         )
 
         if result.returncode == 0:
-            self.output_box.setText(result.stdout)
+            output = result.stdout.strip()
+
+            if "Decoded message:" in output:
+                output = output.replace(
+                    "Decoded message:",
+                    ""
+                ).strip()
+
+            self.output_box.setText(output)
+
             self.status_label.setText(
                 "Status: Decode successful"
             )
+
         else:
+            error_message = result.stderr.strip()
+
+            if not error_message:
+                error_message = "Decode failed"
+
             self.status_label.setText(
-                "Status: Decode failed"
+                f"Status: {error_message}"
             )

@@ -1,4 +1,5 @@
 import subprocess
+import os
 
 from PyQt6.QtWidgets import (
     QWidget,
@@ -18,27 +19,56 @@ class EncodePage(QWidget):
         self.image_path = ""
 
         layout = QVBoxLayout()
-        layout.setSpacing(15)
+
+        layout.setContentsMargins(
+            40,
+            40,
+            40,
+            40
+        )
+
+        layout.setSpacing(20)
 
         back_button = QPushButton("← Back")
+        back_button.setFixedHeight(42)
+
         back_button.clicked.connect(
             self.main_window.show_home
         )
 
-        self.image_label = QLabel("No image selected")
+        self.image_label = QLabel(
+            "No image selected"
+        )
 
-        select_button = QPushButton("Choose Image")
-        select_button.clicked.connect(self.select_image)
+        select_button = QPushButton(
+            "Choose Image"
+        )
+
+        select_button.setFixedHeight(42)
+
+        select_button.clicked.connect(
+            self.select_image
+        )
 
         self.message_box = QTextEdit()
+
         self.message_box.setPlaceholderText(
             "Enter secret message"
         )
 
-        encode_button = QPushButton("Encode")
-        encode_button.clicked.connect(self.encode_message)
+        encode_button = QPushButton(
+            "Encode"
+        )
 
-        self.status_label = QLabel("Status: Ready")
+        encode_button.setFixedHeight(42)
+
+        encode_button.clicked.connect(
+            self.encode_message
+        )
+
+        self.status_label = QLabel(
+            "Status: Ready"
+        )
 
         layout.addWidget(back_button)
         layout.addWidget(select_button)
@@ -59,13 +89,21 @@ class EncodePage(QWidget):
 
         if file_path:
             self.image_path = file_path
-            self.image_label.setText(file_path)
+
+            filename = os.path.basename(
+                file_path
+            )
+
+            self.image_label.setText(
+                filename
+            )
 
     def encode_message(self):
         if not self.image_path:
             self.status_label.setText(
                 "Status: Select an image"
             )
+
             return
 
         message = self.message_box.toPlainText()
@@ -74,6 +112,7 @@ class EncodePage(QWidget):
             self.status_label.setText(
                 "Status: Message is empty"
             )
+
             return
 
         output_path, _ = QFileDialog.getSaveFileName(
@@ -102,7 +141,13 @@ class EncodePage(QWidget):
             self.status_label.setText(
                 "Status: Encoding successful"
             )
+
         else:
+            error_message = result.stderr.strip()
+
+            if not error_message:
+                error_message = "Encoding failed"
+
             self.status_label.setText(
-                "Status: Encoding failed"
+                f"Status: {error_message}"
             )
